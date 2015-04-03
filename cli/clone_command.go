@@ -48,7 +48,7 @@ func (cloneCommand *CloneCommand) DownloadFile() {
 
 		fmt.Println(header.Typeflag == tar.TypeReg)
 
-		filename := "./" + header.Name
+		filename := "./role/postgres/" + header.Name
 		switch header.Typeflag {
 		case tar.TypeDir:
 			os.MkdirAll(filename, os.FileMode(header.Mode))

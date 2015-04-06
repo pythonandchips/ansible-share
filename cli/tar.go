@@ -4,6 +4,7 @@ import (
 	"archive/tar"
 	"bytes"
 	"compress/gzip"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -13,7 +14,45 @@ type Compressor interface {
 	Compress(string, []File) []byte
 }
 
+type Decompressor interface {
+	Uncompress([]byte, string)
+}
+
 type Tar struct {
+}
+
+func (t Tar) Uncompress(file []byte, basePath string) {
+	fileReader := bytes.NewReader(file)
+	gzipReader, gzipErr := gzip.NewReader(fileReader)
+	if gzipErr != nil {
+		fmt.Println(gzipErr)
+	}
+	tarBallReader := tar.NewReader(gzipReader)
+	for {
+		header, err := tarBallReader.Next()
+		if err == io.EOF {
+			break
+		}
+
+		filename := basePath + "/" + header.Name
+		switch header.Typeflag {
+		case tar.TypeDir:
+			os.MkdirAll(filename, os.FileMode(header.Mode))
+		case tar.TypeReg:
+			os.MkdirAll(filepath.Dir(filename), 0700)
+			fmt.Println("uncompressing " + filename)
+			writer, writeErr := os.Create(filename)
+			if writeErr != nil {
+				fmt.Println("Write error")
+				fmt.Println(writeErr)
+			}
+			io.Copy(writer, tarBallReader)
+			os.Chmod(filename, os.FileMode(header.Mode))
+			writer.Close()
+		default:
+			fmt.Printf("Unable to untar type: %c in file %s", header.Typeflag, filename)
+		}
+	}
 }
 
 func (t Tar) Compress(root string, files []File) []byte {

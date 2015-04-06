@@ -52,7 +52,10 @@ func Push(c *cli.Context) {
 
 func Clone(c *cli.Context) {
 	tag := c.Args()[0]
-	cloneCommand := NewCloneCommand(tag)
-	fmt.Println("Cloning " + tag)
-	cloneCommand.Execute()
+	tar := Tar{}
+	role := NewRole(tag)
+	transport := HttpTransport{}
+	file := transport.DownloadFile(role.Url())
+	basePath := "./role" + role.name
+	tar.Uncompress(file, basePath)
 }

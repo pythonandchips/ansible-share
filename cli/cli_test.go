@@ -10,23 +10,22 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
-	"os"
+	"net/url"
 	"testing"
 
 	"github.com/codegangsta/cli"
 )
 
 func TestPushToServer(t *testing.T) {
-	defer os.Remove("/tmp/ansible_share/postgres/v1.1")
-
 	var file multipart.File
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		file, _, _ = r.FormFile("role")
 	}))
 	defer ts.Close()
+	url, _ := url.Parse(ts.URL)
 
 	set := flag.NewFlagSet("test", 0)
-	tag := ts.URL + "/postgres:v1.1"
+	tag := url.Host + "/postgres:v1.1"
 	path := "/Users/colingemmell/1partcarbon/capasa/ansible/roles/nginx"
 	set.Parse([]string{path})
 	set.String("tag", tag, "doc")

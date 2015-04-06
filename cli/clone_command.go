@@ -25,7 +25,7 @@ func (cloneCommand *CloneCommand) Execute() {
 }
 
 func (cloneCommand *CloneCommand) DownloadFile() {
-	resp, getErr := http.Get("http://localhost:8080/roles/postgres/ba39cf0ff88f481f921c160700bf72a3")
+	resp, getErr := http.Get("http://localhost:8080/roles/postgres/v1.1")
 	if getErr != nil {
 		fmt.Println(getErr)
 	}

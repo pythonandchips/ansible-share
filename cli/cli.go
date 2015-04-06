@@ -43,8 +43,11 @@ func checkerror(err error) {
 func Push(c *cli.Context) {
 	tag := c.String("tag")
 	path := c.Args()[0]
-	pushCommand := NewPushCommand(tag, path)
-	pushCommand.Execute()
+	role := NewRole(tag)
+	walker := FileWalker{}
+	compressor := Tar{}
+	httpTransport := HttpTransport{url: role.Url()}
+	PushRole(path, walker, compressor, httpTransport)
 }
 
 func Clone(c *cli.Context) {

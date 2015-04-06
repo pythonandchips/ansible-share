@@ -11,12 +11,29 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os"
 	"testing"
 
 	"github.com/codegangsta/cli"
 )
 
+func CreateTestFiles() {
+	os.MkdirAll("./nginx/tasks", 0700)
+	fileContent := `
+---
+name: test task
+command: do something good
+`
+	ioutil.WriteFile("./nginx/tasks/main.yml", []byte(fileContent), 0700)
+}
+
+func DestroyTestFiles() {
+	os.RemoveAll("./nginx")
+}
+
 func TestPushToServer(t *testing.T) {
+	CreateTestFiles()
+	defer DestroyTestFiles()
 	var file multipart.File
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		file, _, _ = r.FormFile("role")
@@ -26,7 +43,7 @@ func TestPushToServer(t *testing.T) {
 
 	set := flag.NewFlagSet("test", 0)
 	tag := url.Host + "/postgres:v1.1"
-	path := "/Users/colingemmell/1partcarbon/capasa/ansible/roles/nginx"
+	path := "./nginx"
 	set.Parse([]string{path})
 	set.String("tag", tag, "doc")
 	context := cli.NewContext(nil, set, set)

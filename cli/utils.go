@@ -1,6 +1,9 @@
 package main
 
-import "os"
+import (
+	"fmt"
+	"os"
+)
 
 func exists(path string) bool {
 	_, err := os.Stat(path)
@@ -11,4 +14,11 @@ func exists(path string) bool {
 		return false
 	}
 	return false
+}
+
+func checkerror(err error) {
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }

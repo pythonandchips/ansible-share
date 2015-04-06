@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/codegangsta/cli"
@@ -33,13 +32,6 @@ func main() {
 	app.Run(os.Args)
 }
 
-func checkerror(err error) {
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-}
-
 func Push(c *cli.Context) {
 	tag := c.String("tag")
 	path := c.Args()[0]
@@ -47,7 +39,9 @@ func Push(c *cli.Context) {
 	walker := FileWalker{}
 	compressor := Tar{}
 	httpTransport := HttpTransport{url: role.Url()}
-	PushRole(path, walker, compressor, httpTransport)
+	files := walker.ListFiles(path)
+	tarfile := compressor.Compress(path, files)
+	httpTransport.UploadFile(tarfile, "role", "role.tar.gz")
 }
 
 func Clone(c *cli.Context) {

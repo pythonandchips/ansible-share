@@ -7,6 +7,9 @@ import (
 	"flag"
 	"io"
 	"io/ioutil"
+	"mime/multipart"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"testing"
 
@@ -15,8 +18,15 @@ import (
 
 func TestPushToServer(t *testing.T) {
 	defer os.Remove("/tmp/ansible_share/postgres/v1.1")
+
+	var file multipart.File
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		file, _, _ = r.FormFile("role")
+	}))
+	defer ts.Close()
+
 	set := flag.NewFlagSet("test", 0)
-	tag := "localhost:8080/postgres:v1.1"
+	tag := ts.URL + "/postgres:v1.1"
 	path := "/Users/colingemmell/1partcarbon/capasa/ansible/roles/nginx"
 	set.Parse([]string{path})
 	set.String("tag", tag, "doc")
@@ -24,14 +34,6 @@ func TestPushToServer(t *testing.T) {
 
 	Push(context)
 
-	if !exists("/tmp/ansible_share/postgres/v1.1") {
-		t.Fail()
-	}
-	file, fileErr := os.Open("/tmp/ansible_share/postgres/v1.1")
-	if fileErr != nil {
-		t.Logf("file upload not found")
-		t.FailNow()
-	}
 	role, err := ioutil.ReadAll(file)
 	if err != nil {
 		t.Logf("File not found")

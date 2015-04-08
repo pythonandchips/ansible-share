@@ -47,7 +47,7 @@ func TestCorrectParametersPulledFromTagWithLatestVersion(t *testing.T) {
 
 	role := NewRole(tag)
 
-	StringNotEqual("latest", role.version, t)
+	StringEqual("latest", role.version, t)
 
 }
 

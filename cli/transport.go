@@ -18,6 +18,7 @@ type HttpTransport struct {
 }
 
 func (httpTransport HttpTransport) DownloadFile(url string) []byte {
+	fmt.Println(url)
 	resp, getErr := http.Get(url)
 	if getErr != nil {
 		fmt.Println(getErr)

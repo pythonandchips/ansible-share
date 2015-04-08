@@ -8,10 +8,12 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+
+	"github.com/1partcarbon/ansible_share/file"
 )
 
 type Compressor interface {
-	Compress(string, []File) []byte
+	Compress(string, []file.File) []byte
 }
 
 type Decompressor interface {
@@ -55,7 +57,7 @@ func (t Tar) Uncompress(file []byte, basePath string) {
 	}
 }
 
-func (t Tar) Compress(root string, files []File) []byte {
+func (t Tar) Compress(root string, files []file.File) []byte {
 	if len(files) == 0 {
 		panic("I GOT NO FILES")
 	}
@@ -67,8 +69,8 @@ func (t Tar) Compress(root string, files []File) []byte {
 		if fileInfo.IsDir() {
 			continue
 		}
-		file, _ := os.Open(fileInfo.path)
-		filePath, _ := filepath.Rel(root, fileInfo.path)
+		file, _ := os.Open(fileInfo.Path)
+		filePath, _ := filepath.Rel(root, fileInfo.Path)
 		defer file.Close()
 		header := new(tar.Header)
 		header.Name = filePath

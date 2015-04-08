@@ -16,9 +16,7 @@ func NewRole(tag string) Role {
 	indexOfPath := strings.IndexRune(tag, '/')
 	version := strings.Replace(uuid.New(), "-", "", -1)
 	if indexOfPath < indexOfTagStart && indexOfTagStart != -1 {
-		if tag[indexOfTagStart+1:len(tag)] != "latest" {
-			version = tag[indexOfTagStart+1 : len(tag)]
-		}
+		version = tag[indexOfTagStart+1 : len(tag)]
 		tag = tag[0:indexOfTagStart]
 	}
 	tag = "http://" + tag

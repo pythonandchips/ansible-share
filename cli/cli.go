@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 
+	"github.com/1partcarbon/ansible_share/file"
 	"github.com/codegangsta/cli"
 )
 
@@ -36,12 +37,12 @@ func Push(c *cli.Context) {
 	tag := c.String("tag")
 	path := c.Args()[0]
 	role := NewRole(tag)
-	walker := FileWalker{}
+	walker := file.FileWalker{}
 	compressor := Tar{}
 	httpTransport := HttpTransport{url: role.Url()}
 	files := walker.ListFiles(path)
 	tarfile := compressor.Compress(path, files)
-	httpTransport.UploadFile(tarfile, "role", "role.tar.gz")
+	httpTransport.UploadFile(tarfile, "role", "")
 }
 
 func Clone(c *cli.Context) {

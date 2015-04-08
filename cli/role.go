@@ -11,10 +11,22 @@ type Role struct {
 	host, name, tag, version string
 }
 
+func NewPushRole(tag string) Role {
+	role := NewRole(tag)
+	if role.version == "latest" {
+		role.version = newUuid()
+	}
+	return role
+}
+
+func newUuid() string {
+	return strings.Replace(uuid.New(), "-", "", -1)
+}
+
 func NewRole(tag string) Role {
 	indexOfTagStart := strings.LastIndex(tag, ":")
 	indexOfPath := strings.IndexRune(tag, '/')
-	version := strings.Replace(uuid.New(), "-", "", -1)
+	version := newUuid()
 	if indexOfPath < indexOfTagStart && indexOfTagStart != -1 {
 		version = tag[indexOfTagStart+1 : len(tag)]
 		tag = tag[0:indexOfTagStart]

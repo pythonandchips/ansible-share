@@ -36,7 +36,7 @@ func main() {
 func Push(c *cli.Context) {
 	tag := c.String("tag")
 	path := c.Args()[0]
-	role := NewRole(tag)
+	role := NewPushRole(tag)
 	walker := file.FileWalker{}
 	compressor := Tar{}
 	httpTransport := HttpTransport{url: role.Url()}

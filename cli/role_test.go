@@ -51,6 +51,15 @@ func TestCorrectParametersPulledFromTagWithLatestVersion(t *testing.T) {
 
 }
 
+func TestReplacesLatestWithUUIDWhenRoleForPush(t *testing.T) {
+	tag := "ansible.1pcdev.com:3030/nginx:latest"
+
+	role := NewPushRole(tag)
+
+	StringNotEqual("latest", role.version, t)
+
+}
+
 func StringEqual(expect string, actual string, t *testing.T) {
 	if expect != actual {
 		t.Log("expected " + expect + " to equal " + string(actual))

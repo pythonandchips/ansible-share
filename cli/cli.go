@@ -1,23 +1,18 @@
-package main
+package cli
 
 import (
-	"os"
-
-	"github.com/1partcarbon/ansible_share/file"
-	"github.com/codegangsta/cli"
+	cliApp "github.com/codegangsta/cli"
+	"github.com/pythonandchips/ansible-share/file"
 )
 
-func main() {
-	app := cli.NewApp()
-	app.Name = "Ansible Share"
-	app.Usage = "ansible-share command [command options] path to folder"
-	app.Commands = []cli.Command{
+func Commands() []cliApp.Command {
+	return []cliApp.Command{
 		{
 			Name:   "push",
 			Usage:  "ansible-share push -t name .",
 			Action: Push,
-			Flags: []cli.Flag{
-				cli.StringFlag{
+			Flags: []cliApp.Flag{
+				cliApp.StringFlag{
 					Name:  "tag, t",
 					Value: "nginx",
 					Usage: "name of role, default to folder name",
@@ -30,10 +25,9 @@ func main() {
 			Action: Clone,
 		},
 	}
-	app.Run(os.Args)
 }
 
-func Push(c *cli.Context) {
+func Push(c *cliApp.Context) {
 	tag := c.String("tag")
 	path := c.Args()[0]
 	role := NewPushRole(tag)
@@ -45,7 +39,7 @@ func Push(c *cli.Context) {
 	httpTransport.UploadFile(tarfile, "role", "")
 }
 
-func Clone(c *cli.Context) {
+func Clone(c *cliApp.Context) {
 	tag := c.Args()[0]
 	tar := Tar{}
 	role := NewRole(tag)

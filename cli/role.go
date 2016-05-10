@@ -1,10 +1,10 @@
-package main
+package cli
 
 import (
 	"net/url"
 	"strings"
 
-	"code.google.com/p/go-uuid/uuid"
+	"github.com/satori/go.uuid"
 )
 
 type Role struct {
@@ -20,7 +20,7 @@ func NewPushRole(tag string) Role {
 }
 
 func newUuid() string {
-	return strings.Replace(uuid.New(), "-", "", -1)
+	return strings.Replace(uuid.NewV4().String(), "-", "", -1)
 }
 
 func NewRole(tag string) Role {

@@ -1,12 +1,12 @@
-package main
+package server
 
 import (
 	"fmt"
 	"net/http"
 	"path/filepath"
 
-	"github.com/1partcarbon/ansible_share/file"
 	"github.com/gorilla/mux"
+	"github.com/pythonandchips/ansible-share/file"
 )
 
 func DownloadRoleHandler(response http.ResponseWriter, request *http.Request) {

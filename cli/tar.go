@@ -1,4 +1,4 @@
-package main
+package cli
 
 import (
 	"archive/tar"
@@ -9,7 +9,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/1partcarbon/ansible_share/file"
+	"github.com/pythonandchips/ansible-share/file"
 )
 
 type Compressor interface {

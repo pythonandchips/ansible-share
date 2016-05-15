@@ -15,20 +15,25 @@ func Commands() []cliApp.Command {
 	return []cliApp.Command{
 		{
 			Name:   "push",
-			Usage:  "ansible-share push -t name .",
+			Usage:  "ansible-share push -t {bucket_name}/{role name}:{tag} .",
 			Action: push,
 			Flags: []cliApp.Flag{
 				cliApp.StringFlag{
 					Name:  "tag, t",
-					Value: "nginx",
 					Usage: "name of role, default to folder name",
 				},
 			},
 		},
 		{
 			Name:   "pull",
-			Usage:  "ansible-share clone",
+			Usage:  "ansible-share pull {bucket name}/{role name}:{tag}",
 			Action: pull,
+			Flags: []cliApp.Flag{
+				cliApp.StringFlag{
+					Name:  "update, u",
+					Usage: "update a role or all roles to a tag or latest version",
+				},
+			},
 		},
 	}
 }

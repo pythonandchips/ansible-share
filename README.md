@@ -81,6 +81,7 @@ Create a policy as above and attach it to any users you wish to manage ansible r
 In the future I'll be looking to add the following features
 
 - better error handling and check
+- allow configuration and specification of where roles are saved
 - Update roles command
 - list available roles
 - Support multiple storage types (e.g. rackspace files, private server with http)

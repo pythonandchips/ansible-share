@@ -28,6 +28,7 @@ func (t Tar) Uncompress(file []byte, basePath string) {
 	gzipReader, gzipErr := gzip.NewReader(fileReader)
 	if gzipErr != nil {
 		fmt.Println(gzipErr)
+		return
 	}
 	tarBallReader := tar.NewReader(gzipReader)
 	for {
@@ -36,7 +37,7 @@ func (t Tar) Uncompress(file []byte, basePath string) {
 			break
 		}
 
-		filename := basePath + "/" + header.Name
+		filename := filepath.Join(basePath, header.Name)
 		switch header.Typeflag {
 		case tar.TypeDir:
 			os.MkdirAll(filename, os.FileMode(header.Mode))

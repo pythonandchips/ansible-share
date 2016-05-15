@@ -1,8 +1,14 @@
 package cli
 
 import (
+	"fmt"
+	"path/filepath"
+
 	cliApp "github.com/codegangsta/cli"
+	"github.com/pythonandchips/ansible-share/ansifile"
 	"github.com/pythonandchips/ansible-share/file"
+	"github.com/pythonandchips/ansible-share/role"
+	"github.com/pythonandchips/ansible-share/storage"
 )
 
 func Commands() []cliApp.Command {
@@ -10,7 +16,7 @@ func Commands() []cliApp.Command {
 		{
 			Name:   "push",
 			Usage:  "ansible-share push -t name .",
-			Action: Push,
+			Action: push,
 			Flags: []cliApp.Flag{
 				cliApp.StringFlag{
 					Name:  "tag, t",
@@ -20,31 +26,68 @@ func Commands() []cliApp.Command {
 			},
 		},
 		{
-			Name:   "clone",
+			Name:   "pull",
 			Usage:  "ansible-share clone",
-			Action: Clone,
+			Action: pull,
 		},
 	}
 }
 
-func Push(c *cliApp.Context) {
+func push(c *cliApp.Context) {
 	tag := c.String("tag")
 	path := c.Args()[0]
-	role := NewPushRole(tag)
+	role := role.NewPushRole(tag)
 	walker := file.FileWalker{}
 	compressor := Tar{}
-	httpTransport := HttpTransport{url: role.Url()}
 	files := walker.ListFiles(path)
 	tarfile := compressor.Compress(path, files)
-	httpTransport.UploadFile(tarfile, "role", "")
+	storage := storage.NewS3Storage(role.Host)
+	storage.Put(role.Name, role.Version, tarfile)
 }
 
-func Clone(c *cliApp.Context) {
+func pull(c *cliApp.Context) {
+	if !c.Args().Present() {
+		pullAll()
+		return
+	}
 	tag := c.Args()[0]
+	role := role.NewRole(tag)
+	storage := storage.NewS3Storage(role.Host)
+	version := role.Version
+	if version == "latest" {
+		latestVersion, err := storage.LatestVersion(role.Name)
+		if err != nil {
+			fmt.Println("Cannot pull role: ", err)
+			return
+		}
+		role.Version = latestVersion
+	}
+	downloadRole(role)
+}
+
+func downloadRole(role role.Role) {
+	storage := storage.NewS3Storage(role.Host)
+	file, err := storage.Get(role.Name, role.Version)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	basePath := filepath.Join("./roles", role.Name)
 	tar := Tar{}
-	role := NewRole(tag)
-	transport := HttpTransport{}
-	file := transport.DownloadFile(role.Url())
-	basePath := "./role" + role.name
 	tar.Uncompress(file, basePath)
+	ansiWriteErr := ansifile.Write(role)
+	if ansiWriteErr != nil {
+		fmt.Println(err)
+	}
+}
+
+func pullAll() {
+	roles, err := ansifile.Read()
+	if err != nil {
+		fmt.Println("Error reading ansifile: ", err)
+		return
+	}
+	for _, role := range roles {
+		downloadRole(role)
+	}
 }

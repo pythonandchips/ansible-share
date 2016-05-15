@@ -2,6 +2,11 @@
 
 Share ansible roles between projects
 
+## Purpose
+
+There are a few ways to share roles used in [ansible]() such as Ansible Galaxy or using git submodules. Both of these have some issues in practice. Ansible Galaxy has only public roles so you can't store anything specific to you infrastructure where as git submodules can cause problems when upgrading roles with other playbooks not ready for the upgrade.
+
+Ansible Share was created to try and solve this issue by providing a simple cli backed by [Amazon S3]() that will version ansible roles when uploaded and allow you to up date them when you wish.
 
 ## Current status
 
@@ -9,17 +14,76 @@ v0.1
 
 ## Pre-requisites
 
-* aws account
+* aws account with an S3 bucket setup to store roles 
 * golang
 
 ## Installation
 
+go get -u github.com/pythonandchips/ansible-share
 
 ## Usage
 
+Before using ansible share you will need to create an S3 bucket to store you roles and aws access key with access to the bucket  ether stored as environment variables or held in the `.aws/credentials` file
+
+### Pushing roles to the store
+
+`ansible-share push -t {bucket name}/{role name}:{version} {path to role}`
+
+- bucket name: Then name of the bucket to push the roles to
+- role name: Name of the role to be pushed to S3
+- version (optional): a specifed version for that upload e.g v1.1. if this is not supplied a random generated number will be used instead  
+- path to role: the relative path to the role to be uploaded
+
+This will push a new version of a role to S3.
+
+### Pulling roles from repo
+
+`ansible-share pull {bucket name}/{role name}:{version}`
+
+- bucket name: Then name of the bucket to push the roles to
+- role name: Name of the role to be pushed to S3
+- version (optional): a specifed version for that upload e.g v1.1. if this is not supplied the latest version will be pulled down
+
+This will pull a role and install it in the `roles` directory. It will also write the role to the ansifile.
+
+### Pulling all roles in the ansifile
+
+`ansible-share pull`
+
+This will pull all roles in the ansifile and install them in a `roles` directory
 
 ## Securing Roles
 
+As roles are stored in S3 the easiest way to secure roles is using using amazon IAM polices. 
+
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject",
+                "s3:ListBucket",
+                "s3:PutObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::{bucket name}/*"
+            ]
+        }
+    ]
+}
+```
+Create a policy as above and attach it to any users you wish to manage ansible roles from ansible share. Each user should use their own aws creditials to access stored roles.
+
+## Future features
+
+In the future I'll be looking to add the following features
+
+- better error handling and check
+- Update roles command
+- list available roles
+- Support multiple storage types (e.g. rackspace files, private server with http)
 
 ## Bugs/Features/Prase
 

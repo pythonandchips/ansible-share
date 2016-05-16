@@ -93,7 +93,7 @@ This is not a finite list, if you think of something you would like to see add a
 
 ## Bugs/Features/Prase
 
-It you find any bugs or have some feature requests please add an issue on the repository. Or if you just want to get in touch and tell me how awesome git presenter is you can get me on twitter @colin_gemmell or drop me an email at pythonandchips{at}gmail.com
+It you find any bugs or have some feature requests please add an issue on the repository. Or if you just want to get in touch and tell me how awesome ansible-share is you can get me on twitter @colin_gemmell or drop me an email at pythonandchips{at}gmail.com
 
 ## Contributing to ansible-share
 

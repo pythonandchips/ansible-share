@@ -82,6 +82,8 @@ In the future I'll be looking to add the following features
 
 - better error handling and check
 - allow user to specify aws region
+- supply pre-built binaries for various platforms
+- setup distribution via package managers
 - allow configuration and specification of where roles are saved
 - Update roles command
 - list available roles

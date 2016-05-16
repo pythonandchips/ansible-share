@@ -60,8 +60,38 @@ func (s3Storage S3Storage) LatestVersion(name string) (string, error) {
 	}
 	versionIndex := strings.Index(fullPath, "/") + 1
 	version := fullPath[versionIndex:len(fullPath)]
-	fmt.Println(version)
 	return version, nil
+}
+
+func (s3Storage S3Storage) List() ([]string, error) {
+	params := &s3.ListObjectsV2Input{
+		Bucket: aws.String(s3Storage.bucket),
+	}
+	session := s3Storage.session()
+	result, err := session.ListObjectsV2(params)
+	if err != nil {
+		return []string{}, err
+	}
+	if len(result.Contents) == 0 {
+		return []string{}, errors.New("Role not found in store")
+	}
+	roles := []string{}
+	for _, c := range result.Contents {
+		key := *c.Key
+		folderIndex := strings.Index(key, "/")
+		role := key[0:folderIndex]
+		isIncluded := false
+		for _, r := range roles {
+			if role == r {
+				isIncluded = true
+				break
+			}
+		}
+		if !isIncluded {
+			roles = append(roles, role)
+		}
+	}
+	return roles, nil
 }
 
 func (s3Storage S3Storage) Get(path, version string) ([]byte, error) {

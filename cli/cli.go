@@ -28,12 +28,11 @@ func Commands() []cliApp.Command {
 			Name:   "pull",
 			Usage:  "ansible-share pull {bucket name}/{role name}:{tag}",
 			Action: pull,
-			Flags: []cliApp.Flag{
-				cliApp.StringFlag{
-					Name:  "update, u",
-					Usage: "update a role or all roles to a tag or latest version",
-				},
-			},
+		},
+		{
+			Name:   "list",
+			Usage:  "ansible-share list {bucket name}",
+			Action: list,
 		},
 	}
 }
@@ -48,6 +47,19 @@ func push(c *cliApp.Context) {
 	tarfile := compressor.Compress(path, files)
 	storage := storage.NewS3Storage(role.Host)
 	storage.Put(role.Name, role.Version, tarfile)
+}
+
+func list(c *cliApp.Context) {
+	host := c.Args()[0]
+	storage := storage.NewS3Storage(host)
+	roles, err := storage.List()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	for _, role := range roles {
+		fmt.Println(role)
+	}
 }
 
 func pull(c *cliApp.Context) {

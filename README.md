@@ -89,6 +89,8 @@ In the future I'll be looking to add the following features
 - list available roles
 - Support multiple storage types (e.g. rackspace files, private server with http)
 
+This is not a finite list, if you think of something you would like to see add an issue or alternatively add the feature yourself and open a pull request. Any accepted pull request will be meet with much thanks.
+
 ## Bugs/Features/Prase
 
 It you find any bugs or have some feature requests please add an issue on the repository. Or if you just want to get in touch and tell me how awesome git presenter is you can get me on twitter @colin_gemmell or drop me an email at pythonandchips{at}gmail.com
